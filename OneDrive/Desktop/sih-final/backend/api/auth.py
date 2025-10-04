@@ -1,5 +1,5 @@
 """Authentication API endpoints"""
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
 from typing import Optional
@@ -143,6 +143,14 @@ async def register(request: RegisterRequest):
         )
 
 
+@router.options("/register")
+async def options_register():
+    """
+    Explicit OPTIONS handler for /register to ensure CORS preflight requests succeed.
+    """
+    return Response(status_code=200)
+
+
 @router.post("/login", response_model=AuthResponse)
 async def login(request: LoginRequest):
     """
@@ -191,6 +199,14 @@ async def login(request: LoginRequest):
         )
 
 
+@router.options("/login")
+async def options_login():
+    """
+    Explicit OPTIONS handler for /login to ensure CORS preflight requests succeed.
+    """
+    return Response(status_code=200)
+
+
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
     """
@@ -204,3 +220,4 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         name=current_user["name"],
         role=current_user["role"]
     )
+
