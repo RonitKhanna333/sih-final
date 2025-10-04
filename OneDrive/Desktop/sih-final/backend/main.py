@@ -105,6 +105,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+
+# Short-circuit OPTIONS preflight to avoid body validation errors causing 400 responses.
+@app.middleware("http")
+async def preflight_middleware(request, call_next):
+    # If this is a CORS preflight request, immediately return an empty 200 response
+    if request.method == "OPTIONS":
+        from fastapi import Response
+        return Response(status_code=200)
+    return await call_next(request)
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -162,3 +172,4 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+
